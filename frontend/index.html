@@ -345,7 +345,7 @@
             <div class="card">
                 <div class="stat-title">Recent Activity (Hashed for Privacy)</div>
                 <table class="log-table" id="logs-table">
-                    <tr><th>Company</th><th>Hash Preview</th><th>Status</th><th>Timestamp</th></tr>
+                        <tr><th>Company</th><th>Ciphertext Preview</th><th>Status</th><th>Timestamp</th></tr>
                     <tr><td colspan="4" style="color:#666;text-align:center;padding:20px">No logs yet</td></tr>
                 </table>
             </div>
@@ -618,7 +618,7 @@
                 </div>
             </div>
             <div style="margin-top:15px;padding:12px;background:rgba(0,242,254,.07);border-radius:10px;color:#94a3b8;font-size:.85rem">
-                ✓ Amounts hashed with SHA-256 — raw data not stored
+                ✓ Transaction features encrypted with public-key FE (mpk/msk)
             </div>`;
     }
 
@@ -734,7 +734,7 @@
             const tb   = document.getElementById('logs-table');
 
             if (!data.logs.length) {
-                tb.innerHTML = '<tr><th>Company</th><th>Hash Preview</th><th>Status</th><th>Timestamp</th></tr><tr><td colspan="4" style="color:#666;text-align:center;padding:20px">No activity yet</td></tr>';
+                tb.innerHTML = '<tr><th>Company</th><th>Ciphertext Preview</th><th>Status</th><th>Timestamp</th></tr><tr><td colspan="4" style="color:#666;text-align:center;padding:20px">No activity yet</td></tr>';
                 return;
             }
 
@@ -748,7 +748,7 @@
                 </tr>`;
             }).join('');
 
-            tb.innerHTML = `<tr><th>Company</th><th>Hash Preview</th><th>Status</th><th>Timestamp</th></tr>${rows}`;
+            tb.innerHTML = `<tr><th>Company</th><th>Ciphertext Preview</th><th>Status</th><th>Timestamp</th></tr>${rows}`;
         } catch {}
     }
 

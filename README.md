@@ -16,7 +16,7 @@ Upload CSV          Upload CSV          Upload CSV
     │                   │                   │
     ▼                   ▼                   ▼
 Local analysis      Local analysis      Local analysis
-(amounts hashed)    (amounts hashed)    (amounts hashed)
+(FE-encrypted)      (FE-encrypted)      (FE-encrypted)
     │                   │                   │
     └───────────────────┼───────────────────┘
                         │
@@ -28,14 +28,14 @@ Local analysis      Local analysis      Local analysis
               FRAUD DETECTED / SAFE
 ```
 
-No raw data ever leaves a node. Only processed signals (fraud flag, record count) are combined. Raw amounts are stored as SHA-256 hashes only.
+No raw data ever leaves a node. Only processed signals (fraud flag, record count) are combined. Transaction features are encrypted with the FE public key (`mpk`), while only the trusted server keeps the master secret key (`msk`) needed to derive function keys.
 
 ---
 
 ## Features
 
 - **Federated architecture** — each node analyzes its own data locally
-- **Privacy-preserving** — SHA-256 hashing of all sensitive values
+- **Privacy-preserving** — public-key functional encryption for transaction features
 - **Collaborative decision** — global fraud verdict requires ≥2 nodes
 - **24-hour data window** — stale data is excluded from global analysis
 - **Per-IP node enforcement** — prevents one user from faking multiple nodes
@@ -71,7 +71,8 @@ trustgrid/
 │   └── report.py           # /report (PDF download)
 │
 ├── utils/                  # Pure helper functions (no Flask dependency)
-│   ├── crypto.py           # SHA-256 hashing
+│   ├── crypto.py           # General hashing helpers
+│   ├── functional_encryption.py  # FE setup, mpk/msk helpers, ciphertext handling
 │   ├── fraud.py            # Fraud detection rules
 │   └── pdf.py              # PDF generation + Ollama narrative
 │
@@ -156,7 +157,7 @@ Tests use a temporary in-memory database and do not affect production data.
 | Backend | Python, Flask, Flask-CORS |
 | Database | SQLite (via sqlite3) |
 | Data processing | pandas |
-| Privacy | hashlib (SHA-256) |
+| Privacy | PyMIFE `FeDamgard` public-key functional encryption |
 | PDF generation | ReportLab |
 | AI narrative | Ollama + Gemma 4 (gemma4:e4b) |
 | Frontend | Vanilla HTML/CSS/JS |

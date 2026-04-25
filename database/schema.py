@@ -2,10 +2,11 @@
 database/schema.py
 ------------------
 Database connection helper and schema initialisation.
-All raw SQL lives here — routes never write SQL directly.
+All raw SQL lives here - routes never write SQL directly.
 """
 
 import sqlite3
+
 from config import DB_PATH
 
 
@@ -19,13 +20,13 @@ def get_db() -> sqlite3.Connection:
 def init_db() -> None:
     """
     Create all tables if they do not already exist.
-    Safe to call on every startup — uses IF NOT EXISTS.
+    Safe to call on every startup - uses IF NOT EXISTS.
     """
     conn = get_db()
     c = conn.cursor()
 
-    # ── users ──────────────────────────────────────────────
-    c.execute("""
+    c.execute(
+        """
         CREATE TABLE IF NOT EXISTS users (
             id       INTEGER PRIMARY KEY AUTOINCREMENT,
             node_id  TEXT    UNIQUE NOT NULL,
@@ -34,24 +35,27 @@ def init_db() -> None:
             ip       TEXT,
             created  TEXT    DEFAULT (datetime('now'))
         )
-    """)
+        """
+    )
 
-    # ── transactions ────────────────────────────────────────
-    # Raw amounts are never stored — only their SHA-256 hashes.
-    c.execute("""
+    c.execute(
+        """
         CREATE TABLE IF NOT EXISTS transactions (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
-            company     TEXT    NOT NULL,
-            node_id     TEXT    NOT NULL,
-            amount_hash TEXT    NOT NULL,
-            is_fraud    INTEGER NOT NULL,
-            created     TEXT    DEFAULT (datetime('now'))
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            company       TEXT    NOT NULL,
+            node_id       TEXT    NOT NULL,
+            fe_ciphertext TEXT,
+            fraud_score   INTEGER NOT NULL DEFAULT 0,
+            is_fraud      INTEGER NOT NULL,
+            created       TEXT    DEFAULT (datetime('now'))
         )
-    """)
+        """
+    )
+    _ensure_column(c, "transactions", "fe_ciphertext", "TEXT")
+    _ensure_column(c, "transactions", "fraud_score", "INTEGER NOT NULL DEFAULT 0")
 
-    # ── fraud_outcomes ──────────────────────────────────────
-    # Stores every global analysis result for case memory.
-    c.execute("""
+    c.execute(
+        """
         CREATE TABLE IF NOT EXISTS fraud_outcomes (
             id                  INTEGER PRIMARY KEY AUTOINCREMENT,
             participating_nodes TEXT    NOT NULL,
@@ -61,7 +65,18 @@ def init_db() -> None:
             decision            TEXT,
             created             TEXT    DEFAULT (datetime('now'))
         )
-    """)
+        """
+    )
 
     conn.commit()
     conn.close()
+
+
+def _ensure_column(cursor: sqlite3.Cursor, table: str, column: str, definition: str) -> None:
+    """Add a missing column to an existing SQLite table."""
+    existing = {
+        row["name"] if isinstance(row, sqlite3.Row) else row[1]
+        for row in cursor.execute(f"PRAGMA table_info({table})").fetchall()
+    }
+    if column not in existing:
+        cursor.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")

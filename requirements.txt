@@ -7,6 +7,7 @@ flask-cors==4.0.1
 
 # Data processing
 pandas==2.2.2
+pymife==0.0.14
 
 # PDF generation
 reportlab==4.2.2
