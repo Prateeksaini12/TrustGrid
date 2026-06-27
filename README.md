@@ -1,4 +1,4 @@
-# Trust
+# TrustG
 
 > Federated Fraud Detection — Collaborative. Private. Decentralised.
 
