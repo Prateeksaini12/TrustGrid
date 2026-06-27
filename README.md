@@ -1,4 +1,4 @@
-# TrustGr
+# TrustGri
 
 > Federated Fraud Detection — Collaborative. Private. Decentralised.
 
