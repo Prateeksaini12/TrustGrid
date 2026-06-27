@@ -1,4 +1,4 @@
-# TrustGrid
+# Trust
 
 > Federated Fraud Detection — Collaborative. Private. Decentralised.
 
